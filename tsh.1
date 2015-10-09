@@ -1,0 +1,63 @@
+.\" Process this file with
+.\" groff -man -Tascii TSH.1
+.\"
+.TH TSH 1 "08 OCTOBER 2015" 1.0 "TinyShell man Page"
+.SH NAME
+tsh \- A tiny shell implementation in C
+.SH SYNOPSIS
+.B tsh
+.SH DESCRIPTION
+.B tsh is a minimal Unix shell.
+tsh supports 'bg', 'fg', 'jobs' builtins.
+Jobs in tsh can be transferred between the foreground and background with 'fg' and 'bg' respectively.
+The list and status of jobs can be seen with 'jobs'.
+tsh can also execute external commands.
+
+the main loop in tsh.c first initializes the command buffer, the job list, the shell.
+Then, reads the command line, checks the status of background jobs (and updates them if necessary), then interprets the command line and executes the commands.
+tsh.c also declares signal handlers for SIGTSTP and SIGINT, which are implemented in runtime.c
+
+runtime.c implements a doubly-linked list to maintain the collection of jobs. 
+New jobs can be added as foreground or background jobs, each with a job id (jid) and a process id (pid).
+A foreground job can be sent to the background, and background jobs can be brought to the foreground.
+When new jobs are introduced into the background, the count of jobs is incremented. 
+
+Please see tsh.{c,h}, runtime.{c,h} and the contained comments for implementation details.
+
+.SH COMMANDS
+.IP exit
+Quits tsh
+.IP &
+Runs job in background.
+A command followed by an & will run in the background.
+.IP "COMMAND_OUTPUT >"
+Redirect stdout to a file.
+Creates the file if not present, otherwise overwrites it.
+.IP "COMMAND< FILENAME"
+Accept input from a file.
+.IP jobs
+Displays all running jobs.
+Output is similar to the following:
+.BR [1] Running             sleep 1 
+Here, the job number 1 is running, and the process in this case is the sleep function.
+.IP bg [job]
+Specifies the job that you want to run in the background.
+.IP fg [id]
+Brings the job with the given into the foreground, resuming it if it was suspended.
+.SH FILES
+.I tsh.{c,h}
+.I runtime.{c,h}
+.I interpreter.{c,h}
+.I config.h
+.I MakeFile
+.I testsuite/*.*
+.SH AUTHORS
+.IP CWB541
+Christopher Beauchene <christopherbeauchene2016@u.northwestern.edu>
+.IP HSB732
+Sinan Bolel <sinanbolel@u.northwestern.edu>
+.SH INSTRUCTOR
+.IP "Fabian Bustamante"
+<fabianb@cs.northwestern.edu>
+.SH ORIGINAL AUTHOR
+.IP "Stefan Birrer"
